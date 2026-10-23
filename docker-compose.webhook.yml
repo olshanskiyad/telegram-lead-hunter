@@ -1,0 +1,9 @@
+# Необязательный режим вебхуков для клиентских ботов (нужен публичный HTTPS-адрес, см. README).
+#   docker compose -f docker-compose.yml -f docker-compose.webhook.yml up -d --build
+# В .env должны быть заданы WEBHOOK_HOST и WEBHOOK_PORT; сертификат и ключ лежат в ./certs
+services:
+  app:
+    ports:
+      - "${WEBHOOK_PORT:-8443}:${WEBHOOK_PORT:-8443}"
+    volumes:
+      - ./certs:/app/certs:ro

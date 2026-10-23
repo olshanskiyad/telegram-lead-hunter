@@ -1,0 +1,18 @@
+.git
+.github
+.env
+.env.*
+!.env.example
+*.session
+*.session-journal
+__pycache__/
+*.pyc
+.pytest_cache/
+venv/
+.venv/
+certs/
+logs/
+data/
+# Дампы базы в корне проекта (файлы в migrations/ нужны образу)
+*.sql
+*.dump

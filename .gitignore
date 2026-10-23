@@ -1,0 +1,21 @@
+# Секреты и сессии: в git не попадают
+.env
+.env.*
+!.env.example
+*.session
+*.session-journal
+certs/
+
+# Данные и мусор
+logs/
+data/
+*.log
+*.sql.gz
+*.dump
+# Дампы базы в корне проекта (миграции в migrations/ остаются под git)
+/*.sql
+__pycache__/
+*.pyc
+.pytest_cache/
+venv/
+.venv/

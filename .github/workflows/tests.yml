@@ -1,0 +1,16 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+# Тесты идут внутри Docker-образа проекта: в нём уже есть Python, зависимости и словарь pymorphy3.
+# Сеть, Telegram и база данных не нужны.
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build --target test -t telegram-lead-hunter-test .
+      - run: docker run --rm telegram-lead-hunter-test pytest -q

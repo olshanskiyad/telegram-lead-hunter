@@ -1,0 +1,44 @@
+# Запуск: cp .env.example .env, заполнить, затем docker compose up -d --build
+# Сессию Telethon создайте один раз командой из README (docker compose run --rm --no-deps app python gen_session.py).
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-leadhunter}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?задайте POSTGRES_PASSWORD в .env}
+      POSTGRES_DB: ${POSTGRES_DB:-leadhunter}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    # Порт наружу не публикуется: в базе токены клиентских ботов и тексты сообщений из чатов
+
+  app:
+    build:
+      context: .
+      target: app
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      # Адрес базы собирается из POSTGRES_* и перекрывает DATABASE_URL из .env
+      DATABASE_URL: postgresql://${POSTGRES_USER:-leadhunter}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-leadhunter}
+      SESSION_DIR: /app/data
+    volumes:
+      - appdata:/app/data    # файл сессии Telethon
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  pgdata:
+  appdata:
